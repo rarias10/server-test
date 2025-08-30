@@ -1,0 +1,40 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: modular-express-redis-mysql:latest
+    restart: unless-stopped
+    env_file:
+      - .env.docker
+    ports:
+      - "8080:8080"
+    depends_on:
+      - redis
+      - mysql
+    # If behind a reverse proxy that sets X-Forwarded-*:
+    # networks: [appnet]
+
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--appendonly", "yes"]
+    volumes:
+      - redisdata:/data
+
+  mysql:
+    image: mysql:8.4
+    restart: unless-stopped
+    environment:
+      MYSQL_DATABASE: app_db
+      MYSQL_USER: app_user
+      MYSQL_PASSWORD: app_password
+      MYSQL_ROOT_PASSWORD: rootpass
+    volumes:
+      - mysqldata:/var/lib/mysql
+      - ./sql/schema.sql:/docker-entrypoint-initdb.d/01-schema.sql:ro
+    # Never expose 3306 publicly in production!
+
+volumes:
+  redisdata:
+  mysqldata:
