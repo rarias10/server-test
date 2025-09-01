@@ -9,17 +9,17 @@ const required = (key, fallback, { allowEmpty = false } = {}) => {
   return val;
 };
 
-const toBool = (v, def=false) => {
+const toBool = (v, def = false) => {
   if (v === undefined || v === null || v === '') return def;
   const s = String(v).toLowerCase().trim();
-  return ['1','true','yes','y','on'].includes(s);
+  return ['1', 'true', 'yes', 'y', 'on'].includes(s);
 };
 
 export const ENV = {
   NODE_ENV: process.env.NODE_ENV || 'development',
   PORT: parseInt(process.env.PORT ?? '8080', 10),
 
-  // CORS
+  // CORS (comma-separated list supported)
   CORS_ORIGIN: required('CORS_ORIGIN', 'http://localhost:5173'),
 
   // Sessions / Redis

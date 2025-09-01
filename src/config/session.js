@@ -18,8 +18,8 @@ export const sessionMiddleware = session({
   saveUninitialized: false,
   cookie: {
     httpOnly: true,
-    sameSite: computedSameSite,            // 'lax' (default) is safest for same-site
-    secure: computedSecure,                // must be true if sameSite is 'none'
-    maxAge: 1000 * 60 * 60 * 2            // 2 hours
-  }
+    sameSite: computedSameSite, // 'lax' (default for your current HTTP setup)
+    secure: computedSecure,     // must be true if sameSite is 'none'
+    maxAge: 1000 * 60 * 60 * 2, // 2 hours
+  },
 });

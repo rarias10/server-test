@@ -10,10 +10,13 @@ const allowed = (ENV.CORS_ORIGIN || '')
 
 export const corsMiddleware = cors({
   origin(origin, cb) {
-    // Allow requests with no origin (like curl or mobile apps)
+    // Allow requests with no origin (curl/health checks/mobile apps)
     if (!origin) return cb(null, true);
     if (allowed.length === 0 || allowed.includes(origin)) return cb(null, true);
     return cb(new Error('CORS not allowed for origin: ' + origin), false);
   },
   credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-CSRF-Token'],
+  maxAge: 86400, // cache preflight for 1 day
 });

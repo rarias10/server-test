@@ -11,13 +11,13 @@ const app = express();
 
 app.set('trust proxy', 1); // needed behind ALB/Heroku/Render/Nginx for secure cookies
 
-// Security & basics
+// Security & CORS/session ordering
 app.use(helmet());
-app.use(express.json());
-
-// CORS & sessions
 app.use(corsMiddleware);
 app.use(sessionMiddleware);
+
+// Body parsing AFTER session so csurf can use the session
+app.use(express.json());
 
 // Routes
 app.use('/api', healthRoutes);

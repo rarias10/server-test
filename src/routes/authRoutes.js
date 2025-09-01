@@ -7,12 +7,15 @@ import { createUser, findUserByEmail } from '../models/userModel.js';
 import { requireAuth } from '../middleware/auth.js';
 
 const router = Router();
+
+// Session-based CSRF (no cookie option)
 const csrfProtection = csrf({ cookie: false });
 const authLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 20 });
 const BCRYPT_ROUNDS = 12;
 
-// CSRF token endpoint
-router.get('/csrf', csrfProtection, (req, res) => {
+// CSRF token endpoint (DO NOT require csrfProtection here)
+// First call must be able to obtain a token & set session cookie.
+router.get('/csrf', (req, res) => {
   res.json({ csrfToken: req.csrfToken() });
 });
 
@@ -57,7 +60,7 @@ router.get('/me', requireAuth, (req, res) => {
   res.json({ user: req.session.user });
 });
 
-// Logout
+// Logout (mutating; keep CSRF)
 router.post('/logout', csrfProtection, requireAuth, (req, res) => {
   req.session.destroy(() => {
     res.clearCookie('sid');
