@@ -1,26 +1,21 @@
 // src/routes/authRoutes.js
 import { Router } from 'express';
 import bcrypt from 'bcrypt';
-import csrf from 'csurf';
 import rateLimit from 'express-rate-limit';
 import { createUser, findUserByEmail } from '../models/userModel.js';
 import { requireAuth } from '../middleware/auth.js';
 
 const router = Router();
-
-// Session-based CSRF (no cookie option)
-const csrfProtection = csrf({ cookie: false });
 const authLimiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 20 });
 const BCRYPT_ROUNDS = 12;
 
-// CSRF token endpoint (DO NOT require csrfProtection here)
-// First call must be able to obtain a token & set session cookie.
+// CSRF token endpoint (req.csrfToken() provided by global csurf in app.js)
 router.get('/csrf', (req, res) => {
   res.json({ csrfToken: req.csrfToken() });
 });
 
-// Register
-router.post('/register', authLimiter, csrfProtection, async (req, res, next) => {
+// Register (csurf validates automatically because it's global)
+router.post('/register', authLimiter, async (req, res, next) => {
   try {
     const { email, password } = req.body ?? {};
     if (!email || !password) return res.status(400).json({ error: 'missing_fields' });
@@ -37,7 +32,7 @@ router.post('/register', authLimiter, csrfProtection, async (req, res, next) => 
 });
 
 // Login
-router.post('/login', authLimiter, csrfProtection, async (req, res, next) => {
+router.post('/login', authLimiter, async (req, res, next) => {
   try {
     const { email, password } = req.body ?? {};
     if (!email || !password) return res.status(400).json({ error: 'missing_fields' });
@@ -60,8 +55,8 @@ router.get('/me', requireAuth, (req, res) => {
   res.json({ user: req.session.user });
 });
 
-// Logout (mutating; keep CSRF)
-router.post('/logout', csrfProtection, requireAuth, (req, res) => {
+// Logout
+router.post('/logout', requireAuth, (req, res) => {
   req.session.destroy(() => {
     res.clearCookie('sid');
     res.json({ ok: true });

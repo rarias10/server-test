@@ -1,6 +1,7 @@
 // src/app.js
 import express from 'express';
 import helmet from 'helmet';
+import csrf from 'csurf';
 import { corsMiddleware } from './config/cors.js';
 import { sessionMiddleware } from './config/session.js';
 import healthRoutes from './routes/healthRoutes.js';
@@ -18,6 +19,9 @@ app.use(sessionMiddleware);
 
 // Body parsing AFTER session so csurf can use the session
 app.use(express.json());
+
+// Mount csurf globally (session-based; safe methods are allowed automatically)
+app.use(csrf({ cookie: false }));
 
 // Routes
 app.use('/api', healthRoutes);
