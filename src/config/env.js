@@ -24,14 +24,14 @@ export const ENV = {
 
   // Sessions / Redis
   SESSION_SECRET: required('SESSION_SECRET', 'change-me'),
-  REDIS_URL: required('REDIS_URL', 'redis://localhost:6379'),
+  REDIS_URL: required('REDIS_URL', 'redis://redis:6379'),
 
   // Cookie security (overridable per env)
   COOKIE_SAMESITE: (process.env.COOKIE_SAMESITE || 'lax').toLowerCase(), // lax | strict | none
   COOKIE_SECURE: toBool(process.env.COOKIE_SECURE, process.env.NODE_ENV === 'production'),
 
   // MySQL
-  MYSQL_HOST: required('MYSQL_HOST', '127.0.0.1'),
+  MYSQL_HOST: required('MYSQL_HOST', 'mysql'),
   MYSQL_PORT: parseInt(process.env.MYSQL_PORT ?? '3306', 10),
   MYSQL_USER: required('MYSQL_USER', 'app_user'),
   MYSQL_PASSWORD: required('MYSQL_PASSWORD', 'app_password'),
