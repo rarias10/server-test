@@ -4,7 +4,7 @@ WORKDIR /app
 
 # Install prod deps from lockfile (faster layer caching)
 COPY package.json package-lock.json* ./
-RUN npm ci --omit=dev
+RUN npm ci --omit=dev --no-audit --no-fund
 
 # Copy only what the server needs at runtime
 COPY src ./src
@@ -19,7 +19,8 @@ ENV NODE_ENV=production
 WORKDIR /app
 
 # tini for signal handling; curl for healthcheck
-RUN apk add --no-cache tini curl
+RUN apk add --no-cache tini curl && \
+    apk upgrade --no-cache
 
 # Non-root user
 RUN addgroup -S nodegrp && adduser -S nodeuser -G nodegrp
